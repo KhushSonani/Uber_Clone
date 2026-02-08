@@ -1,7 +1,8 @@
-const http = require('http');
-const app = require('./app');
-require('dotenv').config();
-const connectToDb = require('./db/db')
+import http from 'http';
+import app  from './app.js';
+import dotenv from 'dotenv';
+dotenv.config();
+import connectToDb from './db/db.js';
 
 const PORT = process.env.PORT || 3000;
 connectToDb();

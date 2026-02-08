@@ -1,7 +1,7 @@
-const dotenv = require('dotenv')
+import dotenv from 'dotenv';
 dotenv.config()
-const express = require('express');
-const cors = require('cors');
+import express from 'express';
+import cors from 'cors';
 const app = express();
 
 app.use(cors());
@@ -11,4 +11,4 @@ app.get('/',(req,res)=>{
     res.send('It is Working');
 });
 
-module.exports = app;
+export default app;
