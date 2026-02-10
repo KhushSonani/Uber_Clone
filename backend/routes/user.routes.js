@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { signupUser } from "../controllers/user.controller.js";
+import { signUpUser , loginUser } from "../controllers/user.controller.js";
 
 
 const router = Router();
@@ -11,10 +11,18 @@ router.post(
         body("username").trim().notEmpty().withMessage("Username is required"),
         body("email").isEmail().withMessage("Valid email is required"),
         body("fullname").trim().notEmpty().withMessage("Full name is required"),
-        body("password").isLength({ min: 6 }).withMessage("Password too short"),
+        body("password").isLength({ min: 6 }).withMessage("Password is too short"),
     ],
-    signupUser
+    signUpUser
 
+);
+router.post(
+    "/login",
+    [
+        body("email").isEmail().withMessage("Valid email is required"),
+        body("password").isLength({min : 6}).withMessage("Password is too short"),
+    ],
+    loginUser
 );
 
 
