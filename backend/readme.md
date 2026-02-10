@@ -1,4 +1,4 @@
-# POST /users/register
+# POST /api/users/signup
 
 Description
 -
@@ -7,7 +7,7 @@ Registers a new user account and returns an access token plus the created user o
 Endpoint
 -
 - Method: `POST`
-- Path: `/users/register`
+- Path: `/api/users/signup`
 - Content-Type: `application/json`
 
 Request body
@@ -79,13 +79,21 @@ Error responses
 
 Notes
 -
-- In this project the controller creating users returns a JWT `token` and the saved `user` (without the password). Adjust the path (`/signup` vs `/users/register`) if your route mapping differs.
+- In this project the controller creating users returns a JWT `token` and the saved `user` (without the password).
 - Use `Content-Type: application/json` header when calling the endpoint.
+- Newly registered users are assigned the default role `rider`.
+
 
 Curl example
 -
 ```bash
-curl -X POST http://localhost:3000/users/register \
+curl -X POST http://localhost:4000/api/users/signup \
   -H "Content-Type: application/json" \
-  -d '{"username":"johndoe","fullname":"John Doe","email":"john@example.com","password":"secret123"}'
+  -d '{
+    "username": "johndoe",
+    "fullname": "John Doe",
+    "email": "john@example.com",
+    "password": "secret123"
+  }'
+
 ```
