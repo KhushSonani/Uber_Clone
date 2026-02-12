@@ -3,6 +3,13 @@ import { createUser } from "../services/user.service.js";
 import { User } from "../models/user.model.js"
 import { generateAccessToken , generateRefreshToken} from "../utils/token.js";
 
+
+const options = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict"    
+};
+
 export const signUpUser = async(req,res)=>{
 
     const error = validationResult(req);
@@ -28,8 +35,10 @@ export const signUpUser = async(req,res)=>{
         email: user.email,
     };
 
+
     res.status(201)
-    .cookie("refreshToken", refreshToken)
+    .cookie("refreshToken", refreshToken,options)
+    // .cookie("accessToken", accessToken,options)
     .json({
         accessToken,
         user: safeUser,
@@ -62,8 +71,12 @@ export const loginUser = async(req,res) => {
         email: user.email,
     };
 
+    // console.log(accessToken);
+    // console.log(refreshToken);
+    
     res.status(200)
-    .cookie("refreshToken", refreshToken)
+    .cookie("refreshToken", refreshToken,options)
+    // .cookie("accessToken", accessToken,options)
     .json({
         accessToken,
         user: safeUser,
@@ -73,4 +86,18 @@ export const loginUser = async(req,res) => {
 
 export const getUserProfile = async(req,res) =>{
     res.status(200).json({user: req.user});
+}
+
+export const logoutUser = async(req,res) => {
+    try {
+        await User.findByIdAndUpdate(req.user._id,{
+            refreshToken: null,
+        });
+
+        res.clearCookie("refreshToken",options);
+        res.status(200).json({message:"Logget out Successfully !"});
+    } catch (err) {
+        res.status(500).json({message:"Log out failed !"});
+        
+    }
 }

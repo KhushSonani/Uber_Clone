@@ -180,3 +180,124 @@ curl -X POST http://localhost:4000/api/users/login \
   -H "Content-Type: application/json" \
   -d '{"email":"john@example.com","password":"secret123"}'
 ```
+
+---
+
+# GET /api/users/profile
+
+Description
+-
+Retrieves the authenticated user's profile information.
+
+Endpoint
+-
+- Method: `GET`
+- Path: `/api/users/profile`
+- Authentication: **Required** (Bearer token in Authorization header)
+
+Request headers
+-
+- `Authorization` (string) — required, format: `Bearer <accessToken>`
+
+Success response
+-
+- Status: `200 OK`
+- Content: JSON object containing the authenticated `user` object.
+
+Example success response
+-
+```json
+{
+  "user": {
+    "_id": "642a1f6e9b1c2a001234abcd",
+    "username": "johndoe",
+    "fullname": "John Doe",
+    "email": "john@example.com"
+  }
+}
+```
+
+Error responses
+-
+- `401 Unauthorized` — missing or invalid authentication token. Example:
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+Notes
+-
+- This endpoint requires a valid access token in the Authorization header.
+- The token is verified by the `authUser` middleware before the controller is invoked.
+
+Curl example
+-
+```bash
+curl -X GET http://localhost:4000/api/users/profile \
+  -H "Authorization: Bearer eyJhbGciOiJI..."
+```
+
+---
+
+# POST /api/users/logout
+
+Description
+-
+Logs out the authenticated user by clearing their refresh token from the database and cookies.
+
+Endpoint
+-
+- Method: `POST`
+- Path: `/api/users/logout`
+- Authentication: **Required** (Bearer token in Authorization header)
+
+Request headers
+-
+- `Authorization` (string) — required, format: `Bearer <accessToken>`
+
+Success response
+-
+- Status: `200 OK`
+- Content: JSON object with logout success message.
+
+Example success response
+-
+```json
+{
+  "message": "Logget out Successfully !"
+}
+```
+
+Error responses
+-
+- `401 Unauthorized` — missing or invalid authentication token. Example:
+
+```json
+{
+  "message": "Unauthorized"
+}
+```
+
+- `500 Internal Server Error` — server error during logout. Example:
+
+```json
+{
+  "message": "Log out failed !"
+}
+```
+
+Notes
+-
+- This endpoint requires a valid access token in the Authorization header.
+- The `refreshToken` cookie is cleared from the client using `res.clearCookie()`.
+- The refresh token is set to `null` in the database for additional security.
+- After logout, the user must log in again to obtain new tokens.
+
+Curl example
+-
+```bash
+curl -X POST http://localhost:4000/api/users/logout \
+  -H "Authorization: Bearer eyJhbGciOiJI..."
+```
