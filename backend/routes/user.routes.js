@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { signUpUser , loginUser , getUserProfile ,logoutUser} 
+import { UsersignUp , Userlogin , getUserProfile ,Userlogout} 
         from "../controllers/user.controller.js";
 import { authUser } from "../middlewares/auth.middleware.js";
 
@@ -15,7 +15,7 @@ router.post(
         body("fullname").trim().notEmpty().withMessage("Full name is required"),
         body("password").isLength({ min: 6 }).withMessage("Password is too short"),
     ],
-    signUpUser
+    UsersignUp
 
 );
 router.post(
@@ -24,11 +24,11 @@ router.post(
         body("email").isEmail().withMessage("Valid email is required"),
         body("password").isLength({min : 6}).withMessage("Password is too short"),
     ],
-    loginUser
+    Userlogin
 );
 
 router.get("/profile",authUser,getUserProfile);
-router.post("/logout",authUser,logoutUser);
+router.post("/logout",authUser,Userlogout);
 
 
 export default router;

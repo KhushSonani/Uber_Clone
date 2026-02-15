@@ -10,43 +10,57 @@ const options = {
     sameSite: "strict"    
 };
 
-export const signUpUser = async(req,res)=>{
+export const UsersignUp = async(req,res)=>{
 
-    const error = validationResult(req);
-    if(!error.isEmpty()){
-        return res.status(400).json({errors: error.array() });
+    try {
+        const error = validationResult(req);
+        if(!error.isEmpty()){
+            return res.status(400).json({errors: error.array() });
+        }
+
+        const { username,fullname,email,password } = req.body;
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                message: "User already exists with this email",
+            });
+        }
+        const user = await createUser({
+            username,
+            fullname,
+            email,
+            password,
+        });
+
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user); 
+
+        user.refreshToken = refreshToken;
+        await user.save({ validateBeforeSave: false });
+
+        const safeUser = {
+            id: user._id,
+            username: user.username,
+            fullname: user.fullname,
+            email: user.email,
+            role: user.role,
+        };
+
+
+        res.status(201)
+        .cookie("refreshToken", refreshToken,options)
+        // .cookie("accessToken", accessToken,options)
+        .json({
+            accessToken,
+            user: safeUser,
+        });
+    } catch (err) {
+        console.error("Signup Error:", err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-
-    const { username,fullname,email,password } = req.body;
-
-    const user = await createUser({
-        username,
-        fullname,
-        email,
-        password,
-    });
-
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user); 
-    const safeUser = {
-        id: user._id,
-        username: user.username,
-        fullname: user.fullname,
-        email: user.email,
-    };
-
-
-    res.status(201)
-    .cookie("refreshToken", refreshToken,options)
-    // .cookie("accessToken", accessToken,options)
-    .json({
-        accessToken,
-        user: safeUser,
-    });
-
 };
 
-export const loginUser = async(req,res) => {
+export const Userlogin = async(req,res) => {
     const error = validationResult(req);
     if(!error.isEmpty()){
         return res.status(401).json({errors: error.array() });
@@ -55,12 +69,12 @@ export const loginUser = async(req,res) => {
     const {email,password} = req.body;
     const user = await User.findOne({ email }).select('+password');
     if(!user){
-        return res.status(401).json({message: 'Invalid email or password'});
+        return res.status(400).json({message: 'Invalid email or password'});
     }
 
     const isMatch = await user.isPasswordCorrect(password);
     if(!isMatch){
-        return res.status(401).json({message: 'Invalid email or password'});
+        return res.status(400).json({message: 'Invalid email or password'});
     }
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user); 
@@ -70,6 +84,8 @@ export const loginUser = async(req,res) => {
         fullname: user.fullname,
         email: user.email,
     };
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
 
     // console.log(accessToken);
     // console.log(refreshToken);
@@ -88,7 +104,7 @@ export const getUserProfile = async(req,res) =>{
     res.status(200).json({user: req.user});
 }
 
-export const logoutUser = async(req,res) => {
+export const Userlogout = async(req,res) => {
     try {
         await User.findByIdAndUpdate(req.user._id,{
             refreshToken: null,
