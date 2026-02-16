@@ -1,16 +1,18 @@
-import React,{useEffect} from 'react'
+import React,{useEffect,useState} from 'react'
 import api from '../api'
 import { useNavigate } from 'react-router-dom'
 import Button from '../components/Button'
 import { use } from 'react'
 
 const Dashboard = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [user,setUser] = useState(null);
   useEffect(() => {
     const fetchProfile = async ()=>{
       try {
         const res = await api.get("/users/profile");
         console.log("Profile Data:",res.data);
+        setUser(res.data.user);
         
       } catch (err) {
         console.error("Failed to fetch profile:", err.response ? err.response.data : err.message);
@@ -54,7 +56,7 @@ const Dashboard = () => {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Good morning, John</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Good morning, {user?.fullname || 'User'}</h1>
           <p className="text-gray-500 mt-1">Here's what's happening with your rides today</p>
         </div>
 

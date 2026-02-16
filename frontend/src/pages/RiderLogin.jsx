@@ -1,11 +1,10 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import { Link } from 'react-router-dom'
 import Input from '../components/Input'
 import Button from '../components/Button'
 import Navbar from '../components/Navbar'
 import api from '../api'
 import { useNavigate } from 'react-router-dom'
-
 
 
 const RiderLogin = () => {
