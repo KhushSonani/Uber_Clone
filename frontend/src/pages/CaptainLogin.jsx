@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom'
 import Input from '../components/Input'
 import Button from '../components/Button'
 import Navbar from '../components/Navbar'
+import api from '../api'
+import { useNavigate } from 'react-router-dom'
 
 const CaptainLogin = () => {
   const [formData, setFormData] = useState({
@@ -16,10 +18,19 @@ const CaptainLogin = () => {
       [e.target.name]: e.target.value
     })
   }
+  const navigate = useNavigate();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log('Captain Login Form Data:', formData)
+    try{
+      const response = await api.post('/users/login', formData);
+      const token = response.data.accessToken;
+      localStorage.setItem('accessToken', token);
+      console.log("Login Successful");
+      navigate('/dashboard');
+    }catch(err){
+      console.error("Login Failed:", err.response ? err.response.data : err.message);
+    }
   }
 
   return (

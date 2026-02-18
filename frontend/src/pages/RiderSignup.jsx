@@ -6,8 +6,8 @@ import Navbar from '../components/Navbar'
 
 const RiderSignup = () => {
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    userName: '',
+    fullName: '',
     email: '',
     phone: '',
     password: '',
@@ -39,13 +39,13 @@ const RiderSignup = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-4">
                 <Input
-                  label="First Name"
+                  label="User Name"
                   type="text"
-                  name="firstName"
-                  placeholder="John"
-                  value={formData.firstName}
+                  name="userName"
+                  placeholder="John012"
+                  value={formData.userName}
                   onChange={handleChange}
                   required
                   icon={
@@ -55,11 +55,11 @@ const RiderSignup = () => {
                   }
                 />
                 <Input
-                  label="Last Name"
+                  label="Full Name"
                   type="text"
-                  name="lastName"
-                  placeholder="Doe"
-                  value={formData.lastName}
+                  name="fullName"
+                  placeholder="John Doe"
+                  value={formData.fullName}
                   onChange={handleChange}
                   required
                 />
