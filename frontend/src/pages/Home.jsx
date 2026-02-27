@@ -1,86 +1,107 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import Button from '../components/Button'
-import Navbar from '../components/Navbar'
+import Layout from '../components/Layout'
 
 const Home = () => {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
-      <Navbar transparent={true} />
-      
-      <div className="relative min-h-screen flex items-center justify-center px-4">
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-700"></div>
+    <Layout>
+      <div className="relative flex min-h-screen flex-col text-white">
+        {/* Fullscreen map background */}
+        <div className="absolute inset-0">
+          <div className="h-full w-full bg-[radial-gradient(circle_at_top,_#18181b,_#020617)]" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/80 to-black/50" />
+          <div className="pointer-events-none absolute inset-6 rounded-3xl border border-zinc-800/60" />
+          <div className="pointer-events-none absolute inset-x-10 top-16 h-32 rounded-3xl border border-zinc-700/40 bg-zinc-900/40" />
+          <div className="pointer-events-none absolute inset-x-16 bottom-40 h-32 rounded-3xl border border-zinc-700/40 bg-zinc-900/30" />
         </div>
 
-        <div className="relative max-w-6xl mx-auto text-center">
-          <div className="mb-8">
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Your ride, on demand
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto">
-              Request a ride, hop in, and go. Choose from multiple ride options for any occasion.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition duration-300">
-              <div className="w-16 h-16 bg-black rounded-xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Ride with us</h3>
-              <p className="text-gray-600 mb-6">Book rides anytime, anywhere</p>
-              <div className="space-y-3">
-                <Button onClick={() => navigate('/rider/signup')} variant="primary">
-                  Sign Up
-                </Button>
-                <Button onClick={() => navigate('/rider/login')} variant="secondary">
-                  Log In
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 shadow-2xl transform hover:scale-105 transition duration-300">
-              <div className="w-16 h-16 bg-black rounded-xl flex items-center justify-center mx-auto mb-6">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Drive with us</h3>
-              <p className="text-gray-600 mb-6">Earn money on your schedule</p>
-              <div className="space-y-3">
-                <Button onClick={() => navigate('/captain/signup')} variant="primary">
-                  Sign Up
-                </Button>
-                <Button onClick={() => navigate('/captain/login')} variant="secondary">
-                  Log In
-                </Button>
-              </div>
+        {/* Overlay content */}
+        <div className="relative z-10 flex flex-1 flex-col justify-between px-4 pt-6 pb-4 animate-fade-in">
+          {/* Top label */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => navigate('/')}
+              className="rounded-full bg-black/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-200 shadow-sm border border-zinc-800 transition-colors duration-200 hover:bg-black/70 hover:text-white"
+              type="button"
+            >
+              RIDESYNC
+            </button>
+            <div className="flex items-center space-x-2 text-xs text-zinc-400">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" />
+              <span>Online</span>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-8 max-w-3xl mx-auto text-white">
-            <div>
-              <div className="text-4xl font-bold mb-2">100K+</div>
-              <div className="text-gray-400">Active Users</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">50+</div>
-              <div className="text-gray-400">Cities</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold mb-2">4.8★</div>
-              <div className="text-gray-400">Average Rating</div>
+          {/* Bottom sheet */}
+          <div className="pointer-events-none mt-auto flex justify-center">
+            <div className="pointer-events-auto w-full rounded-3xl bg-black/95 p-5 pb-6 shadow-sm border border-zinc-800 md:pb-7 transition-colors duration-200">
+              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-700" />
+
+              <div className="mb-4">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  Book your next ride
+                </h1>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Set your pickup, choose a ride, and go. Simple, fast, and always nearby.
+                </p>
+              </div>
+
+              <div className="mb-4 space-y-3">
+                <div className="rounded-2xl bg-zinc-900 px-4 py-3 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-zinc-400">Pickup</span>
+                    <span className="text-sm font-medium">Current location</span>
+                  </div>
+                  <span className="text-xs text-indigo-400">Change</span>
+                </div>
+                <div className="rounded-2xl bg-zinc-900 px-4 py-3 flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium text-zinc-400">Destination</span>
+                    <span className="text-sm font-medium text-zinc-400">Where to?</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => navigate('/rider/signup')}
+                className="mb-3 flex w-full min-h-12 items-center justify-center rounded-2xl bg-indigo-600 text-sm font-semibold shadow-sm transition-all duration-200 hover:bg-indigo-500 active:scale-[0.99]"
+                type="button"
+              >
+                Book a ride
+              </button>
+
+              <div className="mt-2 flex flex-col gap-3 text-xs text-zinc-400 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  onClick={() => navigate('/rider/login')}
+                  className="w-full text-left font-medium text-indigo-400 underline-offset-2 transition-colors duration-200 hover:text-indigo-300 hover:underline sm:w-auto"
+                  type="button"
+                >
+                  Already have an account? Log in
+                </button>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <button
+                    onClick={() => navigate('/rider/signup')}
+                    className="w-full rounded-xl border border-zinc-800 bg-black px-4 py-2.5 text-xs font-medium text-zinc-200 shadow-sm transition-colors duration-200 hover:bg-zinc-900 sm:w-auto"
+                    type="button"
+                  >
+                    Sign up as rider
+                  </button>
+                  <button
+                    onClick={() => navigate('/captain/signup')}
+                    className="w-full rounded-xl border border-zinc-800 bg-black px-4 py-2.5 text-xs font-medium text-zinc-200 shadow-sm transition-colors duration-200 hover:bg-zinc-900 sm:w-auto"
+                    type="button"
+                  >
+                    Sign up as captain
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   )
 }
 
