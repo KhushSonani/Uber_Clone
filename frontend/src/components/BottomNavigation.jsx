@@ -4,12 +4,25 @@ import { useAuth } from "../context/AuthContext";
 const navItems = [
   { key: 'home', label: 'Home', path: '/' },
   { key: 'rides', label: 'Rides', path: '/dashboard' },
-  { key: 'account', label: 'Account', path: '/rider/login' },
+  { key: 'account', label: 'Account' },
 ]
 
 const BottomNavigation = () => {
   const location = useLocation()
   const navigate = useNavigate()
+  const { user } = useAuth();
+
+  const handleNavigation = (item) => {
+    if(item.key === 'account'){
+      if(user){
+        navigate('/account')
+      }else{
+        navigate('/rider/login')
+      }
+    }else{
+      navigate(item.path)
+    }
+  }
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 md:hidden">
@@ -17,12 +30,15 @@ const BottomNavigation = () => {
         <div className="rounded-2xl bg-black/95 text-white shadow-sm border border-zinc-800">
           <div className="flex items-center justify-between px-2">
             {navItems.map((item) => {
-              const isActive = location.pathname === item.path
+              const isActive =
+                item.key === 'account'
+                ? (user && location.pathname === '/dashboard') || (!user && location.pathname === '/rider/login'):
+                  location.pathname === item.path
 
               return (
                 <button
                   key={item.key}
-                  onClick={() => navigate(item.path)}
+                  onClick={() => handleNavigation(item)}
                   className={`flex flex-1 flex-col items-center justify-center gap-1 py-2 min-h-12 rounded-xl text-xs font-medium tracking-wide transition-colors ${
                     isActive
                       ? 'bg-white text-black'
