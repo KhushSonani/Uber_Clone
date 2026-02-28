@@ -1,6 +1,7 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '../components/Layout'
+import MapView from '../components/Mapcontainer'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -9,13 +10,7 @@ const Home = () => {
     <Layout>
       <div className="relative flex min-h-screen flex-col text-white">
         {/* Fullscreen map background */}
-        <div className="absolute inset-0">
-          <div className="h-full w-full bg-[radial-gradient(circle_at_top,_#18181b,_#020617)]" />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/80 to-black/50" />
-          <div className="pointer-events-none absolute inset-6 rounded-3xl border border-zinc-800/60" />
-          <div className="pointer-events-none absolute inset-x-10 top-16 h-32 rounded-3xl border border-zinc-700/40 bg-zinc-900/40" />
-          <div className="pointer-events-none absolute inset-x-16 bottom-40 h-32 rounded-3xl border border-zinc-700/40 bg-zinc-900/30" />
-        </div>
+        <MapView />
 
         {/* Overlay content */}
         <div className="relative z-10 flex flex-1 flex-col justify-between px-4 pt-6 pb-4 animate-fade-in">
