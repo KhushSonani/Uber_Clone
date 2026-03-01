@@ -83,6 +83,7 @@ export const Userlogin = async(req,res) => {
         username: user.username,
         fullname: user.fullname,
         email: user.email,
+        role : user.role,
     };
     user.refreshToken = refreshToken;
     await user.save({ validateBeforeSave: false });

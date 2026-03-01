@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body } from "express-validator";
-import { captainsignUp, captainlogin } from "../controllers/captain.controller.js";
+import { captainsignUp } from "../controllers/captain.controller.js";
 
 const router = Router();
 

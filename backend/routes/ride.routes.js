@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { body } from "express-validator";
-import { createRide } from  "../controllers/ride.controller.js"
+import { body, param } from "express-validator";
+import { createRide , getPendingRides, acceptride } from  "../controllers/ride.controller.js"
 import { authUser } from "../middlewares/auth.middleware.js"
 
 const router = Router();
@@ -14,6 +14,21 @@ router.post(
         body("fare").isNumeric().withMessage("Fare must be a number "),
     ],
     createRide
+);
+
+router.get(
+    "/pending",
+    authUser,
+    getPendingRides
+);
+
+router.patch(
+    "/:id/accept",
+    authUser,
+    [
+        param("id").notEmpty().withMessage("Ride Id is required ")
+    ],
+    acceptride,
 );
 
 export default router;

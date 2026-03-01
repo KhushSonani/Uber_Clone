@@ -91,67 +91,67 @@ export const captainsignUp = async (req, res) => {
   }
 };
 
-export const captainlogin = async (req, res) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        errors: errors.array(),
-      });
-    }
+// export const captainlogin = async (req, res) => {
+//   try {
+//     const errors = validationResult(req);
+//     if (!errors.isEmpty()) {
+//       return res.status(400).json({
+//         success: false,
+//         errors: errors.array(),
+//       });
+//     }
 
-    const { email, password } = req.body;
-    const user = await User.findOne({ email }).select("+password");
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid email or password ",
-      });
-    }
+//     const { email, password } = req.body;
+//     const user = await User.findOne({ email }).select("+password");
+//     if (!user) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid email or password ",
+//       });
+//     }
 
-    if (user.role !== "driver") {
-      return res.status(403).json({
-        success: false,
-        message: "Access Denied. Not a captain account.",
-      });
-    }
+//     if (user.role !== "driver") {
+//       return res.status(403).json({
+//         success: false,
+//         message: "Access Denied. Not a captain account.",
+//       });
+//     }
 
-    const isPasswordValid = await user.isPasswordCorrect(password);
-    if (!isPasswordValid) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid email or password",
-      });
-    }
+//     const isPasswordValid = await user.isPasswordCorrect(password);
+//     if (!isPasswordValid) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Invalid email or password",
+//       });
+//     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+//     const accessToken = generateAccessToken(user);
+//     const refreshToken = generateRefreshToken(user);
 
-    user.refreshToken = refreshToken;
-    await user.save({ validateBeforeSave: false });
+//     user.refreshToken = refreshToken;
+//     await user.save({ validateBeforeSave: false });
 
-    const safeUser = {
-      id: user._id,
-      username: user.username,
-      fullname: user.fullname,
-      email: user.email,
-      role: user.role,
-    };
+//     const safeUser = {
+//       id: user._id,
+//       username: user.username,
+//       fullname: user.fullname,
+//       email: user.email,
+//       role: user.role,
+//     };
 
-    const captain = await Captain.findOne({ user: user._id });
-    return res.status(200).cookie("refreshToken", refreshToken, options).json({
-      success: true,
-      message: "Captain logged in successfully.",
-      accessToken,
-      user: safeUser,
-      captain,
-    });
-  } catch (err) {
-    console.error("Captain Login Error:", err);
-    return res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
-  }
-};
+//     const captain = await Captain.findOne({ user: user._id });
+//     return res.status(200).cookie("refreshToken", refreshToken, options).json({
+//       success: true,
+//       message: "Captain logged in successfully.",
+//       accessToken,
+//       user: safeUser,
+//       captain,
+//     });
+//   } catch (err) {
+//     console.error("Captain Login Error:", err);
+//     return res.status(500).json({
+//       success: false,
+//       message: "Internal Server Error",
+//     });
+//   }
+// };
