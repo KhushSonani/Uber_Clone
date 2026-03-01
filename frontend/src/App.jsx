@@ -9,6 +9,10 @@ import NotFound from './pages/NotFound'
 import Home from './pages/Home'
 
 function App() {
+  const { loading } = useAuth();
+  if(loading){
+    return null;
+  }
   return (
     <BrowserRouter>
       <Routes>

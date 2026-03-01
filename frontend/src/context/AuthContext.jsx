@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async()=>{
     try {
       const response = await api.get('/users/profile');
-      setUser(response.data);
+      setUser(response.data.user);
     } catch (err) {
       setUser(null);
       localStorage.removeItem('accessToken');
@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = (token) =>{
+  const login = async(token) =>{
     localStorage.setItem('accessToken', token);
     fetchProfile();
   }

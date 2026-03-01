@@ -11,12 +11,16 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 // configures only after creating app
+// middlewares
 app.use(cors({
     origin: process.env.CORS_ORIGIN,
     credentials: true,
 }));
+// for files
 app.use(express.json());
+// for url
 app.use(express.urlencoded({ extended:true }));
+// for perform operations on user cookies
 app.use(cookieParser());    
 
 app.get('/',(req,res)=>{
