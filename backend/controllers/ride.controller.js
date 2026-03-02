@@ -1,5 +1,6 @@
 import { validationResult } from "express-validator";
 import { Ride } from "../models/ride.model.js";
+import { Captain } from "../models/captain.model.js";
 
 export const createRide = async (req, res) => {
   try {
@@ -41,11 +42,12 @@ export const getPendingRides = async (req, res) => {
         errors: errors.array(),
       });
     }
-
-    if (req.user.role !== "driver") {
+    const captain = await Captain.findOne({user : req.user._id});
+    
+    if(!captain || captain.status !== "available"){
       return res.status(403).json({
         success: false,
-        message: "Only Captains can View pending rides",
+        message: "You are currently Busy",
       });
     }
 
@@ -77,24 +79,24 @@ export const acceptride = async (req, res) => {
       });
     }
 
-    if (req.user.role !== "driver") {
+    const captain = await Captain.findOne({user : req.user._id});
+    if(!captain || captain.status !== "available"){
       return res.status(403).json({
         success: false,
-        message: "Only captains can accept rides",
+        message: "You are currently not available",
       });
     }
-
     const rideId = req.params.id;
     // we can do it by findById,but it causes race condition if two captain click accepted same time
     // so this function finds document,update it and returns it
-    // this is atomically -> cannot be interrupted in between   
+    // this is atomically -> cannot be interrupted in between
     const ride = await Ride.findOneAndUpdate(
-      {_id : rideId, status:"pending",}, // filter object
+      { _id: rideId, status: "pending" }, // filter object
       {
         status: "accepted", // updates object
         captain: req.user._id,
       },
-      {new :true} // by default this fun returns old docs, so this returns updated docs
+      { new: true }, // by default this fun returns old docs, so this returns updated docs
     );
 
     if (!ride) {
@@ -103,6 +105,20 @@ export const acceptride = async (req, res) => {
         message: "Ride not found or already accepted",
       });
     }
+
+    const updatedCaptain = await Captain.findOneAndUpdate(
+      { user: req.user._id,},
+      { status: "busy",},
+      { new : true,}
+    );
+    if(!updatedCaptain){
+      return res.status(500).json({
+        success: false,
+        message: "Failed to update captain status"
+      });
+    }
+
+
     // if (ride.status !== "pending") {
     //   return res.status(400).json({
     //     success: false,
@@ -121,7 +137,88 @@ export const acceptride = async (req, res) => {
     console.error("Accepted Ride Error !", err);
     return res.status(500).json({
       success: false,
-      message: "Interval Server Error",
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const completeRide = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+
+    const ride = await Ride.findOneAndUpdate(
+      {
+        // filters to find ride
+        _id: req.params.id,
+        captain: req.user._id,
+        status: "accepted",
+      },
+      {
+        // updates to make in DB
+        status: "completed",
+      },
+      {
+        // return new updated object instead old
+        new: true,
+      },
+    );
+
+    if (!ride) {
+      return res.status(404).json({
+        success: false,
+        message: "Ride not found or not allowed to complete",
+      });
+    }
+
+    await Captain.findOneAndUpdate(
+      {user : req.user._id, status: "busy"},
+      {status: "available"},
+      {new : true}
+    )
+
+    return res.status(200).json({
+      success: true,
+      message: "Ride completed successfully",
+      ride,
+    });
+
+    // Other easy method to learn and understand
+    // const ride = await Ride.findById(req.params.id);
+    // if (!ride) {
+    //   return res.status(404).json({
+    //     success: false,
+    //     message: "Ride not exist !",
+    //   });
+    // }
+
+    // if (ride.status !== "accepted") {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Ride is not in accepted state",
+    //   });
+    // }
+
+    // if(ride.captain.toString() !== req.user._id.toString()){
+    //   return res.status(403).json({
+    //     success: false,
+    //     message: "You are not assigned to this ride ",
+    //   });
+    // }
+
+    // ride.status = "completed"
+    // await ride.save();
+    // return success msg
+  } catch (err) {
+    console.error("Complete Ride Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
     });
   }
 };

@@ -9,7 +9,7 @@ const captainSchema = new mongoose.Schema({
     status:{
         type: String,
         enum: ["available", "busy"],
-        default: "busy",
+        default: "available",
     },
     vehicle:{
         color:{
