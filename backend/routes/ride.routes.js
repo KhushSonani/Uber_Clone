@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { body, param } from "express-validator";
-import { createRide , getPendingRides, acceptride, completeRide } from  "../controllers/ride.controller.js"
+import { createRide , getPendingRides, acceptride, completeRide, cancelRide } from  "../controllers/ride.controller.js"
 import { authUser } from "../middlewares/auth.middleware.js"
 import { allowCaptainOnly, allowRiderOnly } from "../middlewares/role.middleware.js";
 
@@ -43,7 +43,16 @@ router.patch(
     ],
     allowCaptainOnly,
     completeRide,
-)
+);
+
+router.patch(
+    "/:id/cancel",
+    authUser,
+    [
+        param("id").notEmpty().withMessage("Ride Id is required ")
+    ],
+    cancelRide,
+);
 
 
 

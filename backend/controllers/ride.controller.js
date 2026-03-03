@@ -42,9 +42,9 @@ export const getPendingRides = async (req, res) => {
         errors: errors.array(),
       });
     }
-    const captain = await Captain.findOne({user : req.user._id});
-    
-    if(!captain || captain.status !== "available"){
+    const captain = await Captain.findOne({ user: req.user._id });
+
+    if (!captain || captain.status !== "available") {
       return res.status(403).json({
         success: false,
         message: "You are currently Busy",
@@ -79,8 +79,8 @@ export const acceptride = async (req, res) => {
       });
     }
 
-    const captain = await Captain.findOne({user : req.user._id});
-    if(!captain || captain.status !== "available"){
+    const captain = await Captain.findOne({ user: req.user._id });
+    if (!captain || captain.status !== "available") {
       return res.status(403).json({
         success: false,
         message: "You are currently not available",
@@ -107,17 +107,16 @@ export const acceptride = async (req, res) => {
     }
 
     const updatedCaptain = await Captain.findOneAndUpdate(
-      { user: req.user._id,},
-      { status: "busy",},
-      { new : true,}
+      { user: req.user._id },
+      { status: "busy" },
+      { new: true },
     );
-    if(!updatedCaptain){
+    if (!updatedCaptain) {
       return res.status(500).json({
         success: false,
-        message: "Failed to update captain status"
+        message: "Failed to update captain status",
       });
     }
-
 
     // if (ride.status !== "pending") {
     //   return res.status(400).json({
@@ -176,11 +175,18 @@ export const completeRide = async (req, res) => {
       });
     }
 
-    await Captain.findOneAndUpdate(
-      {user : req.user._id, status: "busy"},
-      {status: "available"},
-      {new : true}
-    )
+    const updatedCaptain = await Captain.findOneAndUpdate(
+      { user: req.user._id, status: "busy" },
+      { status: "available" },
+      { new: true },
+    );
+
+    if (!updatedCaptain) {
+      return res.status(500).json({
+        success: false,
+        message: "Ride completed but failed to update captain status",
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -216,6 +222,116 @@ export const completeRide = async (req, res) => {
     // return success msg
   } catch (err) {
     console.error("Complete Ride Error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+export const cancelRide = async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        errors: errors.array(),
+      });
+    }
+
+    const ride = await Ride.findById(req.params.id);
+    if (!ride) {
+      return res.status(404).json({
+        success: false,
+        message: "Ride not found",
+      });
+    }
+
+    if (req.user.role === "rider") {
+      if (ride.rider.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Not your ride",
+        });
+      }
+
+      if (ride.status === "completed") {
+        return res.status(400).json({
+          success: false,
+          message: "Completed ride cannot be cancelled",
+        });
+      }
+
+      if (ride.captain) {
+        const updatedCaptain = await Captain.findOneAndUpdate(
+          { user: ride.captain ,status: "busy"},
+          { status: "available" },
+        );
+        if (!updatedCaptain) {
+          return res.status(500).json({
+            success: false,
+            message: "Failed to update captain status",
+          });
+        }
+      }
+
+      ride.status = "cancelled";
+      ride.captain = null;
+      await ride.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Ride cancelled successfully",
+        ride,
+      });
+    }
+
+    if (req.user.role === "driver") {
+      
+      if (ride.status !== "accepted") {
+        return res.status(400).json({
+          success: false,
+          message: "Only accepted rides can be cancelled",
+        });
+      }
+      
+      if (ride.captain?.toString() !== req.user._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Not assigned to this ride",
+        });
+      }
+
+
+      ride.status = "pending";
+      ride.captain = null;
+      await ride.save();
+
+      const updatedCaptain = await Captain.findOneAndUpdate(
+        { user: req.user._id ,status: "busy"},
+        { status: "available" },
+      );
+
+      if (!updatedCaptain) {
+        return res.status(500).json({
+          success: false,
+          message: "Failed to update captain status",
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Ride cancelled by captain",
+        ride,
+      });
+    }
+
+    return res.status(403).json({
+      success: false,
+      message: "Unauthorized role",
+    });
+  } catch (err) {
+    console.error("Cancel Ride Error:", err);
     return res.status(500).json({
       success: false,
       message: "Internal Server Error",
