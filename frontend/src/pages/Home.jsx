@@ -7,10 +7,12 @@ const Home = () => {
   const navigate = useNavigate()
 
   return (
-    <Layout>
+    <Layout fullWidth={true} showBottomNav={false}>
       <div className="relative flex min-h-screen flex-col text-white">
         {/* Fullscreen map background */}
-        <MapView />
+        <div className="absolute inset-0 z-0">
+          <MapView />
+        </div>
 
         {/* Overlay content */}
         <div className="relative z-10 flex flex-1 flex-col justify-between px-4 pt-6 pb-4 animate-fade-in">
@@ -30,10 +32,8 @@ const Home = () => {
           </div>
 
           {/* Bottom sheet */}
-          <div className="pointer-events-none mt-auto flex justify-center">
-            <div className="pointer-events-auto w-full rounded-3xl bg-black/95 p-5 pb-6 shadow-sm border border-zinc-800 md:pb-7 transition-colors duration-200">
-              <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-zinc-700" />
-
+          <div className="pointer-events-none mt-auto w-full px-4">
+            <div className="pointer-events-auto w-full rounded-3xl bg-zinc-900/90 backdrop-blur-xl p-5 shadow-2xl border border-zinc-800">
               <div className="mb-4">
                 <h1 className="text-2xl font-semibold tracking-tight">
                   Book your next ride
@@ -61,7 +61,7 @@ const Home = () => {
 
               <button
                 onClick={() => navigate('/rider/signup')}
-                className="mb-3 flex w-full min-h-12 items-center justify-center rounded-2xl bg-indigo-600 text-sm font-semibold shadow-sm transition-all duration-200 hover:bg-indigo-500 active:scale-[0.99]"
+                className="mb-3 flex w-full min-h-12 items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-90 text-sm font-semibold shadow-sm transition-all duration-200 hover:bg-indigo-500 active:scale-[0.99]"
                 type="button"
               >
                 Book a ride

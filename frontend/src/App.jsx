@@ -6,6 +6,7 @@ import CaptainSignup from './pages/CaptainSignup'
 import CaptainLogin from './pages/CaptainLogin'
 import Dashboard from './pages/Dashboard'
 import NotFound from './pages/NotFound'
+import { useAuth } from './context/AuthContext'
 import Home from './pages/Home'
 
 function App() {

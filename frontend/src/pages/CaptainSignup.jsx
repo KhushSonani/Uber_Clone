@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Input from "../components/Input";
-import Navbar from "../components/Navbar";
 import api from "../api";
 import { useAuth } from "../context/AuthContext.jsx";
+import AuthLayout from "../components/UI/AuthLayout";
 
 const CaptainSignup = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     username: "",
@@ -21,8 +24,6 @@ const CaptainSignup = () => {
     vehicleType: "",
   });
 
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -32,18 +33,31 @@ const CaptainSignup = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match");
       return;
     }
+
+    if (!Number.isInteger(Number(formData.capacity))) {
+      setError("Capacity must be a valid whole number");
+      return;
+    }
+
+    if (Number(formData.capacity) < 1) {
+      setError("Capacity must be at least 1");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       const payload = {
         username: formData.username,
         fullname: formData.fullname,
         email: formData.email,
-        // phone: formData.phone,
+        phone: formData.phone,
         password: formData.password,
         vehicle: {
           color: formData.color,
@@ -55,169 +69,185 @@ const CaptainSignup = () => {
 
       const response = await api.post("/captains/signup", payload);
       const token = response.data.accessToken;
-      const { login } = useAuth();
       login(token);
       navigate("/dashboard");
     } catch (err) {
-      console.error(err.response?.data || err.message);
+      setError(err.response?.data?.message || "Signup failed. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
-      <Navbar />
+    <AuthLayout
+      title="Become a Captain"
+      subtitle="Start earning on your own schedule"
+      error={error}
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
 
-      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-8">
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100">
-          <div className="p-8 sm:p-10">
-            <div className="mb-10 text-center sm:text-left">
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-black tracking-tight mb-2">
-                Become a Captain
-              </h2>
-              <p className="text-gray-500 text-lg">
-                Start earning on your own schedule
-              </p>
-            </div>
+        {/* Username + Fullname */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-zinc-400 mb-2">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              placeholder="captain_john"
+              value={formData.username}
+              onChange={handleChange}
+              required
+              className="w-full h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+            />
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                <div className="space-y-5">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <Input
-                      label="User Name"
-                      type="text"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleChange}
-                      required
-                    />
-                    <Input
-                      label="Full Name"
-                      type="text"
-                      name="fullname"
-                      value={formData.fullname}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <Input
-                      label="Email"
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                    />
-                    <Input
-                      label="Phone Number"
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <Input
-                      label="Password"
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      required
-                    />
-                    <Input
-                      label="Confirm Password"
-                      type="password"
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                <div className="space-y-5">
-                  <div>
-                    <select
-                      name="vehicleType"
-                      value={formData.vehicleType}
-                      onChange={handleChange}
-                      required
-                      className="w-full px-4 py-3.5 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-black">
-                      <option value="" disabled>
-                        Select vehicle type
-                      </option>
-                      <option value="car">🚗 Car</option>
-                      <option value="scooter">🛵 Scooter</option>
-                      <option value="bike">🏍️ Bike</option>
-                      <option value="auto">🛺 Auto</option>
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                    <Input
-                      label="Vehicle Number"
-                      type="text"
-                      name="plate"
-                      value={formData.plate}
-                      onChange={handleChange}
-                      required
-                    />
-                    <Input
-                      label="Vehicle Color"
-                      type="text"
-                      name="color"
-                      value={formData.color}
-                      onChange={handleChange}
-                      required
-                    />
-                    <Input
-                      label="Capacity"
-                      type="number"
-                      name="capacity"
-                      value={formData.capacity}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4">
-                <button
-                  type="submit"
-                  className="w-full bg-black text-white py-4 rounded-xl text-lg font-bold">
-                  Register as Captain
-                </button>
-              </div>
-            </form>
-
-            <div className="mt-10 pt-8 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-gray-600 text-sm">
-                Already registered?{" "}
-                <Link
-                  to="/captain/login"
-                  className="text-black font-semibold hover:underline">
-                  Sign In
-                </Link>
-              </p>
-
-              <Link
-                to="/rider/signup"
-                className="text-sm text-gray-500 hover:text-black transition-colors font-medium">
-                Want to ride? Sign up as Rider →
-              </Link>
-            </div>
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-zinc-400 mb-2">
+              Full Name
+            </label>
+            <input
+              type="text"
+              name="fullname"
+              placeholder="John Doe"
+              value={formData.fullname}
+              onChange={handleChange}
+              required
+              className="w-full h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+            />
           </div>
         </div>
+
+        {/* Email + Phone */}
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            type="email"
+            name="email"
+            placeholder="john@example.com"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            className="h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          />
+
+          <input
+            type="tel"
+            name="phone"
+            placeholder="+91 98765 43210"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            className="h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          />
+        </div>
+
+        {/* Password + Confirm */}
+        <div className="grid grid-cols-2 gap-4">
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            value={formData.password}
+            onChange={handleChange}
+            required
+            className="h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          />
+
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirm password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            required
+            className="h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          />
+        </div>
+
+        {/* Vehicle Type */}
+        <div className="relative">
+          <select
+            name="vehicleType"
+            value={formData.vehicleType}
+            onChange={handleChange}
+            required
+            className="w-full h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 pr-10 text-sm appearance-none outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          >
+            <option value="" disabled>
+              Select vehicle type
+            </option>
+            <option value="car">Car</option>
+            <option value="scooter">Scooter</option>
+            <option value="bike">Bike</option>
+            <option value="auto">Auto</option>
+          </select>
+
+          <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-zinc-400">
+            ▼
+          </div>
+        </div>
+
+        {/* Vehicle Details */}
+        <div className="grid grid-cols-3 gap-4">
+          <input
+            type="text"
+            name="plate"
+            placeholder="MH12AB1234"
+            value={formData.plate}
+            onChange={handleChange}
+            required
+            className="h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          />
+
+          <input
+            type="text"
+            name="color"
+            placeholder="White"
+            value={formData.color}
+            onChange={handleChange}
+            required
+            className="h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          />
+
+          <input
+            type="number"
+            name="capacity"
+            placeholder="4"
+            min="1"
+            step="1"
+            value={formData.capacity}
+            onChange={handleChange}
+            required
+            className="h-12 rounded-xl bg-zinc-950 border border-zinc-800 px-4 text-sm outline-none focus:border-white focus:ring-2 focus:ring-white/10 transition"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full h-12 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 active:scale-[0.98] transition disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {loading ? "Registering..." : "Register as Captain"}
+        </button>
+
+      </form>
+
+      <div className="mt-8 pt-6 border-t border-zinc-800 text-center space-y-3 text-xs text-zinc-400">
+        <p>
+          Already registered?{" "}
+          <Link to="/captain/login" className="text-white hover:underline">
+            Sign in
+          </Link>
+        </p>
+        <p>
+          Want to ride?{" "}
+          <Link to="/rider/signup" className="text-white hover:underline">
+            Sign up as rider
+          </Link>
+        </p>
       </div>
-    </div>
+    </AuthLayout>
   );
 };
 
