@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async(token) =>{
     localStorage.setItem('accessToken', token);
-    fetchProfile();
+    await fetchProfile();
   }
   const logout = () =>{
     localStorage.removeItem('accessToken');

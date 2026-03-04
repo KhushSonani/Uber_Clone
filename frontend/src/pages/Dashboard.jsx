@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import RiderDashboard from "./RiderDashboard";
-import CaptainDashboard from "./CaptainDashboard";
+import CaptainDashboard from "./DriverDashboard";
 
 const Dashboard = () => {
   const { user, loading } = useAuth();
@@ -22,7 +22,7 @@ const Dashboard = () => {
     return <RiderDashboard />;
   }
 
-  if (user.role === "captain") {
+  if (user.role === "driver") {
     return <CaptainDashboard />;
   }
 

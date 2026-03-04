@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../api";
+import api from "../api/index.js";
 import { useAuth } from "../context/AuthContext.jsx";
-import AuthLayout from "../components/UI/AuthLayout";
+import AuthLayout from "../components/UI/AuthLayout.jsx";
 
 const CaptainSignup = () => {
   const { login } = useAuth();
@@ -147,6 +147,7 @@ const CaptainSignup = () => {
           <input
             type="password"
             name="password"
+            autoComplete="current-password"
             placeholder="Enter password"
             value={formData.password}
             onChange={handleChange}
@@ -157,6 +158,7 @@ const CaptainSignup = () => {
           <input
             type="password"
             name="confirmPassword"
+            autoComplete="current-password"
             placeholder="Confirm password"
             value={formData.confirmPassword}
             onChange={handleChange}

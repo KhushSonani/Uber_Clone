@@ -2,8 +2,8 @@ import React from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import RiderSignup from './pages/RiderSignup'
 import RiderLogin from './pages/RiderLogin'
-import CaptainSignup from './pages/CaptainSignup'
-import CaptainLogin from './pages/CaptainLogin'
+import CaptainSignup from './pages/DriverSignup'
+import CaptainLogin from './pages/DriverLogin'
 import Dashboard from './pages/Dashboard'
 import NotFound from './pages/NotFound'
 import { useAuth } from './context/AuthContext'
@@ -15,7 +15,12 @@ function App() {
     return null;
   }
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/rider/signup" element={<RiderSignup />} />
